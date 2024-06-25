@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {{template "header" .}}
+    <link rel="stylesheet" href="../style/select2.min.css">
+    <link rel="stylesheet" href="../style/select2-bootstrap4.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">模块管理</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>模块名称</th>
+                                            <th>上级模块</th>
+                                            <th>模块地址</th>
+                                            <th>模块描述</th>
+                                            <th>模块图标</th>
+                                            <th>添加时间</th>
+                                            <th>模块权限</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range $k,$v:=.models}}
+                                        {{if eq $k "infos"}}
+                                        {{range $i:=$v}}
+                                                <tr>
+                                                    <td>{{$i.Module_Id}}</td>
+                                                    <td>{{$i.Module_Name}}</td>
+                                                    <td>{{$i.Parent_Module_Name}}</td>
+                                                    <td>{{$i.Module_Url}}</td>
+                                                    <td>{{$i.Module_Info}}</td>
+                                                    <td>{{$i.Module_Icon}}</td>
+                                                    <td>{{$i.Module_Addtime}}</td>
+                                                    <td>{{$i.Module_Operation}}</td>
+                                                    <td>
+                                                        {{if $.operat.IsUpdate}}
+                                                            <a href="#" class="link-primary link-edit" attr-id="{{$i.Module_Id}}" attr-rn="{{$i.Module_Name}}" attr-prid="{{$i.Parent_Module_Id}}" attr-url="{{$i.Module_Url}}" attr-info="{{$i.Module_Info}}" attr-icon="{{$i.Module_Icon}}" attr-opera="{{$i.Module_Operation}}" onclick="onupdate(this)">
+                                                                <i class="fa fa-edit"></i>
+                                                                <span>修改</span>
+                                                            </a>
+                                                        {{end}}
+                                                        {{if $.operat.IsDel}}
+                                                            <a href="#" class="link-primary link-del" attr-id="{{$i.Module_Id}}" onclick="ondel(this)">
+                                                                <i class="fa fa-trash"></i>
+                                                                <span>删除</span>
+                                                            </a>
+                                                        {{end}}
+                                                    </td>
+                                                </tr>
+                                        {{end}}
+                                        {{end}}
+                                        {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{if .operat.IsAdd}}
+            <div class="modal fade" id="modal-default">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">新增模块</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>名称</label>
+                                <input type="text" class="form-control" id="iName" placeholder="模块名称">
+                            </div>
+                            <div class="form-group">
+                                <label>上级模块</label>
+                                <select class="form-select form-control" id="iParentId">
+                                    <option value="0">请选择上级模块</option>
+                                    {{range $k,$v:=.models}}
+                                    {{if eq $k "infos"}}
+                                    {{range $i:=$v}}
+                                    <option value="{{$i.Module_Id}}">{{$i.Module_Name}}</option>
+                                    {{end}}
+                                    {{end}}
+                                    {{end}}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>地址</label>
+                                <input type="text" class="form-control" id="iUrl" placeholder="模块地址">
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <input type="text" class="form-control" id="iInfo" placeholder="模块描述">
+                            </div>
+                            <div class="form-group">
+                                <label>图标</label>
+                                <input type="text" class="form-control" id="iIcon" placeholder="模块图标">
+                            </div>
+                            <div class="form-group">
+                                <label>功能</label>
+                                <div class="form-control cbi">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbi_S" attr-opera="S" checked="">
+                                        <label for="cbi_S">
+                                            查询
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbi_I" attr-opera="I" checked="">
+                                        <label for="cbi_I">
+                                            增加
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbi_U" attr-opera="U" checked="">
+                                        <label for="cbi_U">
+                                            修改
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbi_D" attr-opera="D" checked="">
+                                        <label for="cbi_D">
+                                            删除
+                                        </label>
+                                    </div>
+                                </div>
+    
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btnAdd">新增</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsUpdate}}
+            <div class="modal fade" id="modal-edit">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">修改模块</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>编号</label>
+                                <label class="lbId"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>名称</label>
+                                <input type="text" class="form-control" id="eName" placeholder="模块名称">
+                            </div>
+                            <div class="form-group">
+                                <label>上级模块</label>
+                                <select class="form-control" id="eParentId">
+                                    <option value="0">请选择上级模块</option>
+                                    {{range $k,$v:=.models}}
+                                    {{if eq $k "infos"}}
+                                    {{range $i:=$v}}
+                                    <option value="{{$i.Module_Id}}">{{$i.Module_Name}}</option>
+                                    {{end}}
+                                    {{end}}
+                                    {{end}}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>地址</label>
+                                <input type="text" class="form-control" id="eUrl" placeholder="模块地址">
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <input type="text" class="form-control" id="eInfo" placeholder="模块描述">
+                            </div>
+                            <div class="form-group">
+                                <label>图标</label>
+                                <input type="text" class="form-control" id="eIcon" placeholder="模块图标">
+                            </div>
+                            <div class="form-group">
+                                <label>功能</label>
+                                <div class="form-control cbe">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbe_S" attr-opera="S" checked="">
+                                        <label for="cbi_S">
+                                            查询
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbe_I" attr-opera="I" checked="">
+                                        <label for="cbi_I">
+                                            增加
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbe_U" attr-opera="U" checked="">
+                                        <label for="cbi_U">
+                                            修改
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="cbe_D" attr-opera="D" checked="">
+                                        <label for="cbi_D">
+                                            删除
+                                        </label>
+                                    </div>
+                                </div>
+    
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btn-save">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsDel}}
+            <div class="modal fade" id="modal-dialog" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">确认</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="delshow"></p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-dark">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    {{template "foot" .}}
+    <script type="text/javascript" src="../lib/select2/select2.full.min.js"></script>
+    {{if .operat.IsAdd}}
+    <script type="text/javascript">
+        $(function () {
+            $('.select2').select2({ minimumResultsForSearch: -1 })
+            $("#btnInsert").on("click", function () {
+                document.querySelectorAll(".modal-default input[type=text]").values("");
+                document.querySelectorAll("#modal-default input[type=text]").forEach(function (i) {
+                    i.value = "";
+                });
+                document.querySelectorAll("input[type=checkbox]").forEach(function (i) {
+                    i.checked = false;
+                });
+                $(".form-select").val("0");
+            });
+        });
+
+        loaded(function () {
+            document.querySelector(".btnAdd").addEventListener("click", function () {
+                var opera = "";
+                document.querySelectorAll(".cbi input[type=checkbox]:checked").forEach(function (i) {
+                    opera += i.getAttribute("attr-opera");
+                });
+                fetch("/permission/addmoduleinfo",
+                    {
+                        method: "post",
+                        headers: {
+                            "Content-type": "application/json;charset=UTF-8"
+                        },
+                        body: JSON.stringify({
+                            Module_Name: $("#iName").val(),
+                            Parent_Module_Id: parseInt($("#iParentId").val()),
+                            Module_Icon: $("#iIcon").val(),
+                            Module_Info: $("#iInfo").val(),
+                            Module_Operation: opera,
+                            Module_Url: $("#iUrl").val(),
+                        })
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (json) {
+                        message(json, function () {
+                            $("#modal-default").modal("hide");
+                            location.reload();
+                        });
+                    }).catch(function (error) {
+                        console.log('Request failed', error);
+                        errorMsg(error);
+                    });
+            });
+        });
+    </script>
+    {{end}}
+    {{if .operat.IsUpdate}}
+    <script type="text/javascript">
+        $(function () {
+            $(".link-edit").on("click", function () {
+                onupdate(this);
+            });
+        });
+        loaded(function () {
+            document.querySelector(".btn-save").addEventListener("click", function () {
+                var opera = "";
+                document.querySelectorAll(".cbe input[type=checkbox]:checked").forEach(function (i) {
+                    opera += i.getAttribute("attr-opera");
+                });
+                fetch("/permission/UpdateModuleInfo",
+                    {
+                        method: "post",
+                        headers: {
+                            "Content-type": "application/json;charset=UTF-8"
+                        },
+                        body: JSON.stringify({
+                            Module_Id: parseInt($(this).attr("attr-id")),
+                            Module_Name: $("#eName").val(),
+                            Parent_Module_Id: parseInt($("#eParentId").val()),
+                            Module_Icon: $("#eIcon").val(),
+                            Module_Info: $("#eInfo").val(),
+                            Module_Operation: opera,
+                            Module_Url: $("#eUrl").val(),
+                        })
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (json) {
+                        message(json, function () {
+                            $("#modal-edit").modal("hide");
+                            location.reload();
+                        });
+                    }).catch(function (error) {
+                        console.log('Request failed', error);
+                        errorMsg(error);
+                    });
+            });
+        });
+        function onupdate(o) {
+            var id = $(o).attr("attr-id");
+            $(".lbId").text(id);
+            $(".btn-save").attr("attr-id", id);
+            $("#eName").val($(o).attr("attr-rn"));
+            $("#eParentId").val($(o).attr("attr-prid"));
+            $("#eUrl").val($(o).attr("attr-url"));
+            $("#eInfo").val($(o).attr("attr-info"));
+            $("#eIcon").val($(o).attr("attr-icon"));
+            var ops = $(o).attr("attr-opera");
+            document.querySelectorAll(".cbe input[type=checkbox]").forEach(function (i) {
+                i.checked = false;
+            });
+            for (var i = 0; i < ops.length; i++) {
+                $(".cbe [attr-opera=" + ops[i] + "]").prop("checked", true);
+            }
+            $("#modal-edit").modal("show");
+        }
+    </script>
+    {{end}}
+    {{if .operat.IsDel}}
+    <script type="text/javascript">
+        $(function () {
+            $(".link-del").on("click", function () {
+                ondel(this);
+            });
+        });
+        loaded(function () {
+            var btn = document.querySelector(".btn-dark");
+            if (btn != undefined) {
+                btn.addEventListener("click", function () {
+                    var uid = this.getAttribute("attr-id");
+                    fetch("/permission/DelModuleInfo", {
+                        method: "post",
+                        headers: {
+                            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        },
+                        body: "moduleId=" + uid + "&" + Date.now()
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (json) {
+                        message(json, function () {
+                            $("#modal-dialog").modal("hide");
+                            location.reload();
+                        });
+
+                    }).catch(function (error) {
+                        console.log('Request failed', error);
+                        errorMsg(error);
+                    });
+                });
+            }
+        })
+
+        function ondel(o) {
+            var id = o.getAttribute("attr-id");
+            document.querySelector("#delshow").textContent = "确认要删除编号【" + id + "】模块及下级所有模块吗？";
+            document.querySelector(".btn-dark").setAttribute("attr-id", id);
+            $("#modal-dialog").modal("show");
+        }
+    </script>
+    {{end}}
+</body>
+</html>

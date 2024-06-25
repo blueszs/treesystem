@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>苗木管理系统</title>
+    <link rel="icon" href="../resources/favicon.ico"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../style/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../style/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../style/adminlte.min.css">
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <b>苗木管理系统</b>
+        </div>
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">开始登录你的账户</p>
+                <div class="input-group mb-3">
+                    <input type="text" id="txtname" class="form-control" placeholder="用户名">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" id="txtpwd" class="form-control" placeholder="密码" autocomplete="off">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">
+                                记住我
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-primary btn-block">登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../lib/jquery/dist/jquery.min.js"></script>
+    <script src="../lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../script/adminlte.min.js"></script>
+    <script type="text/javascript">
+        function authcheck() {
+            setCookie("authtoken", "", 1)
+                var name = document.querySelector("#txtname");
+                var pwd = document.querySelector("#txtpwd");
+                if (name == undefined || name.value == "") {
+                    alert('请输入用户名！')
+                    name.focus();
+                    return;
+                }
+                if (pwd == undefined || pwd.value == "") {
+                    alert('请输入登录密码！')
+                    pwd.focus();
+                    return;
+                }
+                fetch("/authorization", {
+                    method: "post",
+                    headers: {
+                        "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    body: "username=" + name.value + "&password=" + pwd.value
+            }).then(function (response) {
+                return response.json();}).then(function (json) {
+                    console.log('Request succeeded with JSON response', json);
+                    if (json.code == 0) {
+                        alert(json.message);
+                    } else {
+                    setCookie("authtoken", json.data.token, 1)
+                    window.location.href = "../home";
+                    }
+                }).catch(function (error) {
+                console.log('Request failed', error);
+                alert(error);});
+        }
+        var btn = document.querySelector(".btn-primary");
+        btn.addEventListener("click",authcheck);
+        var txtpwd = document.querySelector("#txtpwd");
+        txtpwd.addEventListener("keypress",function(e){
+            if (e.keyCode == "13") {
+                //e.preventDefault();
+                //回车执行查询
+                authcheck();
+            }
+        });
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toGMTString();
+            document.cookie = cname + "=" + cvalue + "; " + expires + ";path=/";
+        }
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i].trim();
+                if (c.indexOf(name) == 0) { return c.substring(name.length, c.length); }
+            }
+            return "";
+        }
+    </script>
+</body>
+</html>

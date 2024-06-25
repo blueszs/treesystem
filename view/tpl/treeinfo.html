@@ -1,0 +1,606 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {{template "header" .}}
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">苗木管理</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>苗木名称</th>
+                                            <th>苗木描述</th>
+                                            <th>苗木信息</th>
+                                            <th>苗木主图</th>
+                                            <th>添加时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{range $k,$v:=.models}}
+                                    {{if eq $k "infos"}}
+                                    {{range $i:=$v}}
+                                        <tr>
+                                            <td>{{$i.Tree_Id}}</td>
+                                            <td>{{$i.Tree_Name}}</td>
+                                            <td>{{$i.Class_Name}}</td>
+                                            <td>
+                                                <span title="{{$i.Tree_Info}}">{{$i.Short_Tree_Info}}</span>
+                                            </td>
+                                            <td>{{$i.Tree_Main_Photo}}</td>
+                                            <td>{{$i.Insert_Time}}</td>
+                                            <td>{{$i.Flag_Info}}</td>
+                                            <td>
+                                                {{if $.operat.IsQuery}}
+                                                    <a href="#" class="link-primary link-show" attr-id="{{$i.Tree_Id}}" attr-name="{{$i.Tree_Name}}" attr-cname="{{$i.Class_Name}}" attr-info="{{$i.Tree_Info}}" attr-mphoto="{{$i.Tree_Main_Photo}}" attr-mphototh="{{$i.Tree_Main_Photo_Thumbnail}}" attr-flag="{{$i.Flag_Info}}" attr-time="{{$i.Insert_Time}}" onclick="showinfo(this)">
+                                                        <i class="fa fa-eye"></i>
+                                                        <span>详情</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsUpdate}}
+                                                    <a href="#" class="link-primary link-edit" attr-id="{{$i.Tree_Id}}" attr-name="{{$i.Tree_Name}}" attr-cid="{{$i.Class_Id}}" attr-info="{{$i.Tree_Info}}" attr-mphoto="{{$i.Tree_Main_Photo}}" attr-mphototh="{{$i.Tree_Main_Photo_Thumbnail}}" attr-flag="{{$i.Flag}}" onclick="updateInfo(this)">
+                                                        <i class="fa fa-edit"></i>
+                                                        <span>修改</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsDel}}
+                                                    <a href="#" class="link-primary link-del" attr-id="{{$i.Tree_Id}}" onclick="delInfo(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                        <span>删除</span>
+                                                    </a>
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                    {{end}}
+                                    {{end}}
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{if .operat.IsQuery}}
+            <div class="modal fade" id="modal-show">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">查看苗场信息</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>编号</label>
+                                        <label class="form-control showinfo" id="sId"></label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>苗木名称</label>
+                                        <label class="form-control showinfo" id="sName"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木类型</label>
+                                        <label class="form-control showinfo" id="sCName"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木描述</label>
+                                        <textarea class="form-control showinfo" id="sInfo" readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木主图</label>
+                                        <label class="form-control showinfo" id="sMainPhoto"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木缩略图预览</label>
+                                        <div class="form-group">
+                                            <img style="width:80px;" id="sMainPhotoThumbnail">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>状态</label>
+                                        <label class="form-control showinfo" id="sFlag"></label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>添加时间</label>
+                                        <label class="form-control showinfo" id="sTime"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsAdd}}
+            <div class="modal fade" id="modal-default">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">新增苗木信息</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>苗木名称</label>
+                                        <input type="text" class="form-control" id="iName" placeholder="苗木名称" reaquired />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>苗木类型</label>
+                                        <select class="form-control select2" id="iClassId">
+                                            <option value="0">请选择苗木类型</option>
+                                            {{range $k,$v:=.models}}
+                                            {{if eq $k "classes"}}
+                                            {{range $i:=$v}}
+                                            <option value="{{$i.Class_Id}}">{{$i.Class_Name}}</option>
+                                            {{end}}
+                                            {{end}}
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木描述</label>
+                                        <textarea type="text" class="form-control" id="iInfo" placeholder="苗木描述" reaquired></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木主图</label>
+                                        <div class="input-group">
+                                            <div class="custom-file ifile">
+                                                <input type="file" accept="image/*" class="custom-file-input" id="iMainPhoto">
+                                                <label class="custom-file-label" for="iMainPhoto">选择图片</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木主图预览</label>
+                                        <div class="input-group">
+                                            <img style="width:80px;" id="iMainPhotoThumbnail">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>状态</label>
+                                        <div class="form-group clearfix">
+                                            <div class="icheck-primary d-inline">
+                                                <input type="radio" id="irad_0" value="0" name="iFlag">
+                                                <label for="irad_0">
+                                                    禁用
+                                                </label>
+                                            </div>
+                                            <div class="icheck-primary d-inline">
+                                                <input type="radio" id="irad_1" value="1" name="iFlag">
+                                                <label for="irad_1">
+                                                    维护
+                                                </label>
+                                            </div>
+                                            <div class="icheck-primary d-inline">
+                                                <input type="radio" id="irad_2" value="2" name="iFlag">
+                                                <label for="irad_2">
+                                                    正常
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btnAdd">新增</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsUpdate}}
+            <div class="modal fade" id="modal-edit">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">修改苗木类型</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="">编号</label>
+                                        <input type="text" class="form-control lbId" id="eid" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>苗木名称</label>
+                                        <input type="text" class="form-control" id="eName" placeholder="苗木名称">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木类型</label>
+                                        <select class="form-control select2" id="eClassId">
+                                            <option value="0">请选择苗木类型</option>
+                                            {{range $k,$v:=.models}}
+                                            {{if eq $k "classes"}}
+                                            {{range $i:=$v}}
+                                            <option value="{{$i.Class_Id}}">{{$i.Class_Name}}</option>
+                                            {{end}}
+                                            {{end}}
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木描述</label>
+                                        <textarea type="text" class="form-control" id="eInfo" placeholder="描述"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>苗木主图</label>
+                                        <div class="custom-file efile">
+                                            <input type="file" accept="image/*" class="custom-file-input" id="eMainPhoto">
+                                            <label class="custom-file-label" for="eMainPhoto">选择图片</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>主图缩略图</label>
+                                        <div class="form-group">
+                                            <img style="width:80px;" id="eMainPhotoThumbnail">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>状态</label>
+                                        <div class="form-group clearfix">
+                                            <div class="icheck-primary d-inline">
+                                                <input type="radio" id="erad_0" value="0" name="eFlag">
+                                                <label for="erad_0">
+                                                    禁用
+                                                </label>
+                                            </div>
+                                            <div class="icheck-primary d-inline">
+                                                <input type="radio" id="erad_1" value="1" name="eFlag">
+                                                <label for="erad_1">
+                                                    维护
+                                                </label>
+                                            </div>
+                                            <div class="icheck-primary d-inline">
+                                                <input type="radio" id="erad_2" value="2" name="eFlag">
+                                                <label for="erad_2">
+                                                    启用
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btn-save">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsDel}}
+            <div class="modal fade" id="modal-dialog" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">确认</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="delshow"></p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-dark">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    {{template "foot" .}}
+    <script src="../lib/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    {{if .operat.IsQuery}}
+        <script type="text/javascript">
+            function showinfo(e) {
+                if (e.nodeName == "A") {
+                    document.querySelectorAll(".modal-body .showinfo").forEach(function (i) {
+                        i.textContent = "";
+                    });
+                    document.querySelector("#sId").textContent = $(e).attr("attr-id");
+                    document.querySelector("#sName").textContent = $(e).attr("attr-name");
+                    document.querySelector("#sCName").textContent = $(e).attr("attr-cname");
+                    document.querySelector("#sMainPhoto").textContent = $(e).attr("attr-mphoto");
+                    document.querySelector("#sMainPhotoThumbnail").setAttribute("src", $(e).attr("attr-mphototh"));
+                    document.querySelector("#sInfo").textContent = $(e).attr("attr-info");
+                    document.querySelector("#sFlag").textContent = $(e).attr("attr-flag");
+                    document.querySelector("#sTime").textContent = $(e).attr("attr-time");
+                    $("#modal-show").modal("show");
+                }
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsAdd}}
+        <script type="text/javascript">
+            loaded(function () {
+                document.querySelector("#modal-default").addEventListener("showadd", function () {
+                    $("[name=iFlag]").prop("checked", false);
+                    $("#modal-default input:text").val("");
+                    $("#iClassId").val(0);
+                    $("#iInfo").val("");
+                    $(".ifile").attr("attr-mphoto","");
+                    $(".ifile").attr("attr-mth","");
+                    $("#iMainPhotoThumbnail").attr("src", "");
+                });
+                document.querySelectorAll(".modal-body input[type=text]").values("");
+                document.querySelector(".btnAdd").addEventListener("click", function () {
+                    fetch("/tree/AddTreeInfo",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Tree_Name: $("#iName").val(),
+                                Class_Id: $("#iClassId").val(),
+                                Tree_Info: $("#iInfo").val(),
+                                Tree_Main_Photo: $(".ifile").attr("attr-mphoto"),
+                                Tree_Main_Photo_Thumbnail: $(".ifile").attr("attr-mth"),
+                                Flag: $("[name=iFlag]:checked").val()
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-default").modal("hide");
+                                $(".ifile").attr("attr-mphoto", "");
+                                $(".ifile").attr("attr-mth", ""),
+                                    location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            $(function () {
+                bsCustomFileInput.init();
+                $("#iMainPhoto").on("change", function () {
+                    var formData = new FormData();
+                    formData.append("files", document.querySelector("#iMainPhoto").files);
+                    $.ajax({
+                        url: "/v1/api/Uploads",
+                        type: "POST",
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            if (data.code == "1") {
+                                $(".ifile").attr("attr-mphoto", data.data[0]);
+                                $(".ifile").attr("attr-mth", data.data[1]);
+                                $("#iMainPhotoThumbnail").attr("src", data.data[1]);
+                                $("#iMainPhoto").val("");
+                            }
+                        },
+                        error: function (err) {
+                            errorMsg(err);
+                            $("#iMainPhoto").val("");
+                        }
+                    });
+                });
+            });
+        </script>
+    {{end}}
+    {{if .operat.IsUpdate}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-edit").on("click", function () {
+                    updateInfo(this);
+                });
+                bsCustomFileInput.init();
+                $("#eMainPhoto").on("change", function () {
+                    var formData = new FormData();
+                    formData.append("files", document.querySelector("#eMainPhoto").files[0]);
+                    $.ajax({
+                        url: "/v1/api/Upload",
+                        type: "POST",
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            if (data.code == "1") {
+                                $(".efile").attr("attr-mphoto", data.data[0]);
+                                $(".efile").attr("attr-mth", data.data[1]);
+                                $("#eMainPhotoThumbnail").attr("src", data.data[1]);
+                                $("#eMainPhoto").val("");
+                            }
+                        },
+                        error: function (err) {
+                            errorMsg(err);
+                            $("#eMainPhoto").val("");
+                        }
+                    });
+                });
+
+            });
+            loaded(function () {
+                document.querySelector(".btn-save").addEventListener("click", function () {
+                    fetch("/tree/UpdateTreeInfo",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Tree_Name: $("#eName").val(),
+                                Class_Id: $("#eClassId").val(),
+                                Tree_Info: $("#eInfo").val(),
+                                Tree_Main_Photo: $(".efile").attr("attr-mphoto"),
+                                Tree_Main_Photo_Thumbnail: $(".efile").attr("attr-mth"),
+                                Flag: $("[name=eFlag]:checked").val(),
+                                Tree_Id: $(this).attr("attr-id")
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-edit").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            function updateInfo(o) {
+                var id = $(o).attr("attr-id");
+                $("#eid").val(id);
+                $(".btn-save").attr("attr-id", id);
+                $("#eName").val($(o).attr("attr-name"));
+                $("#eClassId").val($(o).attr("attr-cid"));
+                $(".efile").attr("attr-mphoto", $(o).attr("attr-mphoto"));
+                $(".efile").attr("attr-mth", $(o).attr("attr-mphototh"));
+                $("#eMainPhotoThumbnail").attr("src", $(o).attr("attr-mphototh"));
+                $("#eInfo").val($(o).attr("attr-info"));
+                $("[name=eFlag][value=" + $(o).attr("attr-flag") + "]").prop("checked", true);
+                $("#modal-edit").modal("show");
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsDel}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-del").on("click", function () {
+                    delInfo(this);
+                });
+            });
+            loaded(function () {
+                var btn = document.querySelector(".btn-dark");
+                if (btn != undefined) {
+                    btn.addEventListener("click", function () {
+                        var uid = this.getAttribute("attr-id");
+                        fetch("/tree/DelTreePlant", {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                            },
+                            body: "id=" + uid + "&" + Date.now()
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-dialog").modal("hide");
+                                location.reload();
+                            });
+
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                    });
+                }
+            })
+
+            function delInfo(o) {
+                var id = o.getAttribute("attr-id");
+                document.querySelector("#delshow").textContent = "确认要删除编号【" + id + "】的苗场信息吗？";
+                document.querySelector(".btn-dark").setAttribute("attr-id", id);
+                $("#modal-dialog").modal("show");
+            }
+        </script>
+    {{end}}
+</body>
+</html>

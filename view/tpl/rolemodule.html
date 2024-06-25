@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+    <meta name="renderer" content="webkit"/>
+    <meta name="force-rendering" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>苗木管理系统</title>
+    <link rel="stylesheet" href="../style/font-awesome.min.css">
+    <link rel="stylesheet" href="../style/adminlte.min.css">
+    <link rel="stylesheet" href="../style/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="../style/toastr.min.css">
+    <link rel="stylesheet" href="../style/site.min.css"/>
+    <link rel="stylesheet" href="../style/tree.min.css" />
+    <style type="text/css">
+        .dt-buttons {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">角色功能</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="card card-row card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            选择角色 
+                                        </h3>
+                                        <i class="fa fa-user"></i>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card card-primary card-outline">
+                                            <div class="card-header">
+                                                <div class="card-title">
+                                                    <select class="form-control" id="iRoleId">
+                                                        <option value="0">请选择角色</option>
+                                                        {{range $k,$v:=.models}}
+                                                        {{if eq $k "roles"}}
+                                                        {{range $i:=$v}}
+                                                        <option value="{{$i.Role_Id}}">{{$i.Role_Name}}</option>
+                                                        {{end}}
+                                                        {{end}}
+                                                        {{end}}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card card-row card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            选择功能
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card card-primary card-outline">
+                                            <div class="card-header">
+                                                <div class="card-info">
+                                                    <div class="tree">
+                                                        <ul>
+                                                        {{range $mk,$mv:=.models}}
+                                                        {{if eq $mk "modules"}}
+                                                        {{range $mi:=$mv}}
+                                                        {{if eq $mi.Parent_Module_Id 0}}
+                                                                <li>
+                                                                    <input type="checkbox" class="imenu" d-id="{{$mi.Module_Id}}" /><a><strong>{{$mi.Module_Name}}</strong></a>
+                                                                    {{range $ms:=$mv}}
+                                                                    {{if eq $ms.Parent_Module_Id $mi.Module_Id}}
+                                                                        
+                                                                            <ul>
+                                                                                    <li>
+                                                                                        <input type="checkbox" class="imenu" d-id="{{$ms.Module_Id}}" /><a><strong>{{$ms.Module_Name}}</strong></a>
+                                                                                        <ul>
+                                                                                            {{range $mso:=$ms.Module_Operations}}
+                                                                                                <li>
+                                                                                                    <label class="form-checkbox form-normal form-primary active">
+                                                                                                        {{if eq $mso "S"}}
+                                                                                                                <i class="fa fa-search"></i>
+                                                                                                                <input type="checkbox" o-id="{{$ms.Module_Id}}" d-right="S" />
+                                                                                                                <strong>查询</strong>
+                                                                                                        {{else if eq $mso "I"}}
+                                                                                                                <i class="fa fa-book"></i>
+                                                                                                                <input type="checkbox" o-id="{{$ms.Module_Id}}" d-right="I" />
+                                                                                                                <strong>新增</strong>
+                                                                                                        {{else if eq $mso "D"}}
+                                                                                                                <i class="fa fa-edit"></i>
+                                                                                                                <input type="checkbox" o-id="{{$ms.Module_Id}}" d-right="D"/>
+                                                                                                                <strong>删除</strong>
+                                                                                                        {{else if eq $mso "U"}}
+                                                                                                                <i class="fa fa-trash"></i>
+                                                                                                                <input type="checkbox" o-id="{{$ms.Module_Id}}" d-right="U" />
+                                                                                                                <strong>修改</strong>
+                                                                                                        {{end}}
+                                                                                                    </label>
+                                                                                                </li>
+                                                                                            {{end}}
+                                                                                        </ul>
+                                                                                    </li>
+                                                                            </ul>
+                                                                    {{end}}
+                                                                    {{end}}
+                                                                    <ul>
+                                                                        {{range $mo:=$mi.Module_Operations}}
+                                                                            <li>
+                                                                                <label class="form-checkbox form-normal form-primary active">
+                                                                                    {{if eq $mo "S"}}
+                                                                                            <i class="fa fa-search"></i>
+                                                                                            <input type="checkbox" d-right="s">
+                                                                                            <strong>查询</strong>
+                                                                                    {{else if eq $mo "I"}}
+                                                                                            <i class="fa fa-book"></i>
+                                                                                            <input type="checkbox" d-right="s">
+                                                                                            <strong>新增</strong>
+                                                                                    {{else if eq $mo "D"}}
+                                                                                            <i class="fa fa-edit"></i>
+                                                                                            <input type="checkbox" d-right="s">
+                                                                                            <strong>删除</strong>
+                                                                                    {{else if eq $mo "U"}}
+                                                                                            <i class="fa fa-trash"></i>
+                                                                                            <input type="checkbox" d-right="s">
+                                                                                            <strong>修改</strong>
+                                                                                    {{end}}
+                                                                                </label>
+                                                                            </li>
+                                                                        {{end}}
+                                                                    </ul>
+                                                                </li>
+                                                        {{end}}        
+                                                        {{end}}
+                                                        {{end}}
+                                                        {{end}}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {{if .operat.IsUpdate}}
+                                                <div class="card-footer" style="text-align:center;">
+                        
+                                                    <button type="button" class="btn btn-primary btn-save">保存</button>
+                        
+                                                </div>
+                                            {{end}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    <script src="../lib/jquery/dist/jquery.min.js"></script>
+    <script src="../script/bootstrap.bundle.min.js"></script>
+    <script src="../lib/toastr/toastr.min.js"></script>
+    <script src="../script/adminlte.min.js"></script>
+    <script type="text/javascript">
+        function loaded(fn) {
+            if (document.readyState != 'loading') {
+                if (fn !=null && fn != undefined) {
+                    fn();
+                }
+            } else {
+                document.addEventListener('DOMContentLoaded', fn);
+            }
+        }
+        function errorMsg(msg) {
+            toastr.options.timeOut = 1200;
+            toastr.options.extendedTimeOut = 10;
+            toastr.error(msg);
+        }
+        function message(result, func) {
+            toastr.options.timeOut = 1200;
+            toastr.options.extendedTimeOut = 10;
+            if (result != null && result != undefined) {
+                if (result.code > 0) {
+                    toastr.options.onHidden = function () {
+                        if (func != null && func != undefined) {
+                            func();
+                        }
+                    };
+                    toastr.success(result.message);
+                } else {
+                    toastr.error(result.message);
+                }
+            } else {
+                toastr.error("参数格式错误！");
+            }
+        }
+    </script>
+    <script type="text/javascript" src="../script/SimpleTree.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".tree").SimpleTree();
+        });
+    </script>
+    {{if .operat.IsUpdate}}
+        <script type="text/javascript">
+            $(function () {
+                $("#iRoleId").val(0);
+            });
+            loaded(function () {
+                document.querySelectorAll(".tree input[type=checkbox]").forEach(function (i) {
+                    i.checked = false;
+                });
+                document.querySelector("#iRoleId").addEventListener("change", function () {
+                    document.querySelectorAll(".tree input[type=checkbox]").forEach(function (i) {
+                        i.checked = false;
+                    });
+                    if (this.value > 0) {
+                        fetch("/permission/getrolemodules",
+                            {
+                                method: "post",
+                                headers: {
+                                    "Content-type": "application/x-www-form-urlencoded;charset=UTF-8"
+                                },
+                                body: "roleId=" + this.value + "&" + Date.now()
+                            }).then(function (response) {
+                                return response.json();
+                            }).then(function (json) {
+                                if (json.code > 0) {
+                                    json.data.forEach(function (e) {
+                                        $("[d-id=" + e.module_id + "]").prop("checked", true);
+                                        if (e.module_operation.length > 0) {
+                                            for (var i = 0; i < e.module_operation.length; i++) {
+                                                $("input[o-id=" + e.module_id + "][d-right=" + e.module_operation[i] + "]").prop("checked", true);
+                                            }
+                                        }
+                                    });
+                                }
+                            }).catch(function (error) {
+                                console.log('Request failed', error);
+                                errorMsg(error);
+                            });
+                    }
+                });
+                document.querySelector(".btn-save").addEventListener("click", function () {
+                    var roleId = document.querySelector("#iRoleId").value;
+                    if (roleId==undefined || roleId == 0){
+                        errorMsg("请选择角色后再保存！");
+                        return;
+                    }
+                    var modulearr=[];
+                    var modules = document.querySelectorAll("[d-id]:checked");
+                    modules.forEach(function(e){
+                         var mid = $(e).attr("d-id");
+                         var opts="";
+                         document.querySelectorAll("[o-id='"+mid+"']:checked").forEach(function(o){
+                            opts += $(o).attr("d-right");
+                         });
+                        modulearr.push({ "module_id": parseInt(mid), "module_operation": opts });
+                    });
+                    fetch("/permission/UpdateRoleModule",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                role_id: parseInt(roleId),
+                                modules: modulearr,
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-edit").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            function onupdate(o) {
+                var id = $(o).attr("attr-id");
+                $(".lbId").text(id);
+                $(".btn-save").attr("attr-id", id);
+                $("#inputRId").val($(o).attr("attr-rn"));
+                $("#inputParentId").val($(o).attr("attr-prid"));
+                $("#modal-edit").modal("show");
+            }
+        </script>
+    {{end}}
+</body>
+</html>

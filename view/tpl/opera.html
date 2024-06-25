@@ -1,0 +1,37 @@
+﻿@model ModuleInfo
+{{define "opera"}}
+<li>
+    <label><input type="checkbox" d-id="{{.Module_Id}}"></label><strong>{{.Module_Name}}</strong>
+</li>
+<ul>
+    {{range $v:=.Module_Operation}}
+        <li>
+            <label class="form-checkbox form-normal form-primary active">
+                @switch (m)
+                {
+                    case 'S':
+                        <i class="fa fa-search"></i>
+                        <input type="checkbox" d-right="s">
+                        <strong>查询</strong>
+                        break;
+                    case 'I':
+                        <i class="fa fa-search"></i>
+                        <input type="checkbox" d-right="s">
+                        <strong>新增</strong>
+                        break;
+                    case 'D':
+                        <i class="fa fa-search"></i>
+                        <input type="checkbox" d-right="s">
+                        <strong>删除</strong>
+                        break;
+                    case 'U':
+                        <i class="fa fa-search"></i>
+                        <input type="checkbox" d-right="s">
+                        <strong>修改</strong>
+                        break;
+                }
+            </label>
+        </li>
+    {{end}}
+</ul>
+{{end}}

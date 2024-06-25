@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    @RenderSection("stylesheet")
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+            @RenderSection("operation")
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    @RenderSection("script")
+</body>
+</html>
+

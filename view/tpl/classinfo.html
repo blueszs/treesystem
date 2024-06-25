@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {{template "header" .}}
+    <link rel="stylesheet" href="../style/select2.min.css">
+    <link rel="stylesheet" href="../style/select2-bootstrap4.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">苗木类型管理</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>苗木类型</th>
+                                            <th>上级类型</th>
+                                            <th>添加时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{range $k,$v:=.models}}
+                                    {{if eq $k "infos"}}
+                                    {{range $i:=$v}}    
+                                        <tr>
+                                            <td>{{$i.Class_Id}}</td>
+                                            <td>{{$i.Class_Name}}</td>
+                                            <td>{{$i.Parent_Class_Name}}</td>
+                                            <td>{{$i.Insert_Time}}</td>
+                                            <td>
+                                                {{if $.operat.IsUpdate}}
+                                                    <a href="#" class="link-primary link-edit" attr-id="{{$i.Class_Id}}" attr-rn="{{$i.Class_Name}}" attr-prid="{{$i.Parent_Class_Id}}" attr-prn="{{$i.Parent_Class_Name}}" onclick="onupdate(this)">
+                                                        <i class="fa fa-edit"></i>
+                                                        <span>修改</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsDel}}
+                                                    <a href="#" class="link-primary link-del" attr-id="{{$i.Class_Id}}" onclick="ondel(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                        <span>删除</span>
+                                                    </a>
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                    {{end}}
+                                    {{end}}
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{if .operat.IsAdd}}
+                <div class="modal fade" id="modal-default">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">新增苗木类型</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>苗木类型名</label>
+                                    <input type="text" class="form-control" id="iName" placeholder="苗木类型名">
+                                </div>
+                                <div class="form-group">
+                                    <label>上级类型</label>
+                                    <select class="form-control select2" id="iParentId">
+                                        <option value="0">请选择上级类型</option>
+                                        {{range $k,$v:=.models}}
+                                        {{if eq $k "infos"}}
+                                        {{range $i:=$v}} 
+                                        <option value="{{$i.Class_Id}}">{{$i.Class_Name}}</option>
+                                        {{end}}   
+                                        {{end}}
+                                        {{end}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" class="btn btn-primary btnAdd">新增</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+            {{if .operat.IsUpdate}}
+                <div class="modal fade" id="modal-edit">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">修改苗木类型</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="">编号</label>
+                                    <label class="lbId"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label>苗木类型名</label>
+                                    <input type="text" class="form-control" id="inputRId" placeholder="苗木类型名">
+                                </div>
+                                <div class="form-group">
+                                    <label>上级类型</label>
+                                    <select class="form-control select2" id="inputParentId">
+                                        <option value="0">请选择上级类型</option>
+                                        {{range $k,$v:=.models}}
+                                        {{if eq $k "infos"}}
+                                        {{range $i:=$v}} 
+                                        <option value="{{$i.Class_Id}}">{{$i.Class_Name}}</option>
+                                        {{end}}   
+                                        {{end}}
+                                        {{end}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" class="btn btn-primary btn-save">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+            {{if .operat.IsDel}}
+                <div class="modal fade" id="modal-dialog" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">确认</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="delshow"></p>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-dark">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    {{template "foot" .}}
+    <script type="text/javascript" src="../lib/select2/select2.full.min.js"></script>
+    {{if .operat.IsAdd}}
+        <script type="text/javascript">
+            $(function () {
+                $(".select2").select2();
+            });
+
+            loaded(function () {
+                document.querySelectorAll(".modal-body input[type=text]").values("");
+                document.querySelector(".btnAdd").addEventListener("click", function () {
+                    fetch("/tree/AddTreeClass",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Class_Name: $("#iName").val(),
+                                Parent_Class_Id: $("#iParentId").val()
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-default").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+        </script>
+    {{end}}
+    {{if .operat.IsUpdate}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-edit").on("click", function () {
+                    onupdate(this);
+                });
+                $(".select2").select2();
+            });
+            loaded(function () {
+                document.querySelector(".btn-save").addEventListener("click", function () {
+                    fetch("/tree/UpdateTreeClass",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Class_Id: parseInt($(this).attr("attr-id")),
+                                Class_Name: $("#inputRId").val(),
+                                Parent_Class_Id: $("#inputParentId").val(),
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-edit").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            function onupdate(o) {
+                var id = $(o).attr("attr-id");
+                $(".lbId").text(id);
+                $(".btn-save").attr("attr-id", id);
+                $("#inputRId").val($(o).attr("attr-rn"));
+                $("#inputParentId").val($(o).attr("attr-prid"));
+                $("#modal-edit").modal("show");
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsDel}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-del").on("click", function () {
+                    ondel(this);
+                });
+            });
+            loaded(function () {
+                var btn = document.querySelector(".btn-dark");
+                if (btn != undefined) {
+                    btn.addEventListener("click", function () {
+                        var uid = this.getAttribute("attr-id");
+                        fetch("/tree/DelTreeClass", {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                            },
+                            body: "id=" + uid + "&" + Date.now()
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-dialog").modal("hide");
+                                location.reload();
+                            });
+
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                    });
+                }
+            })
+
+            function ondel(o) {
+                var id = o.getAttribute("attr-id");
+                document.querySelector("#delshow").textContent = "确认要删除编号【" + id + "】苗木类型及下级所有类型吗？";
+                document.querySelector(".btn-dark").setAttribute("attr-id", id);
+                $("#modal-dialog").modal("show");
+            }
+        </script>
+    {{end}}
+</body>
+</html>

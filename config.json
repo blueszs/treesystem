@@ -1,0 +1,32 @@
+{
+    "database":{
+        "dbtype":"mysql",
+        "userid":"root", 
+        "password":"123qwe", 
+        "host":"127.0.0.1", 
+        "port":"3306", 
+        "dbname":"treemanage", 
+        "charset":"utf8",
+        "pooling":1,
+        "sslmode":"none",
+        "multistatements":"true",
+        "connmaxlifetime":3,
+        "maxopenconns":10,
+        "maxidleconns":10
+    },
+    "web":{
+        "port":8080,
+        "readtimeout":30,
+        "writetimeout":30
+    },
+    "system":{
+        "pwdkey":"5gNc5YNG2Vka3Vh70QcyrNDtjCZOb1QG",
+        "tokenkey":"P2RX6Z80TNDV4248L46RXJXD8DVD06XN"
+    },
+    "cache":[{
+        "ip":"127.0.0.1",
+        "port":"6379",
+        "password":"123qwe",
+        "dbindex":0
+    }]
+}

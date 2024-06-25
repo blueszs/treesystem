@@ -1,0 +1,431 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {{template "header" .}}
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">苗场管理</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>苗场名称</th>
+                                            <th>地址</th>
+                                            <th>联系电话</th>
+                                            <th>联系人</th>
+                                            <th>添加时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{range $k,$v:=.models}}
+                                    {{if eq $k "infos"}}
+                                    {{range $i:=$v}}   
+                                        <tr>
+                                            <td>{{$i.Plant_Id}}</td>
+                                            <td>{{$i.Plant_Name}}</td>
+                                            <td>{{$i.Plant_Address}}</td>
+                                            <td>{{$i.Plant_Tel}}</td>
+                                            <td>{{$i.Plant_Contacts}}</td>
+                                            <td>{{$i.Insert_Time}}</td>
+                                            <td>{{$i.Flag_Info}}</td>
+                                            <td>
+                                                {{if $.operat.IsQuery}}
+                                                    <a href="#" class="link-primary link-show" attr-id="{{$i.Plant_Id}}" attr-rn="{{$i.Plant_Name}}" attr-ptel="{{$i.Plant_Tel}}" attr-prn="{{$i.Plant_Address}}" attr-contact="{{$i.Plant_Contacts}}" attr-flag="{{$i.Flag_Info}}" attr-info="{{$i.Plant_Info}}" attr-time="{{$i.Insert_Time}}" onclick="showinfo(this)">
+                                                        <i class="fa fa-eye"></i>
+                                                        <span>详情</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsUpdate}}
+                                                    <a href="#" class="link-primary link-edit" attr-id="{{$i.Plant_Id}}" attr-rn="{{$i.Plant_Name}}" attr-ptel="{{$i.Plant_Tel}}" attr-prn="{{$i.Plant_Address}}" attr-contact="{{$i.Plant_Contacts}}" attr-flag="{{$i.Flag}}" attr-info="{{$i.Plant_Info}}" onclick="updateInfo(this)">
+                                                        <i class="fa fa-edit"></i>
+                                                        <span>修改</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsDel}}
+                                                    <a href="#" class="link-primary link-del" attr-id="{{$i.Plant_Id}}" onclick="delInfo(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                        <span>删除</span>
+                                                    </a>
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                    {{end}}
+                                    {{end}}
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{if .operat.IsQuery}}
+            <div class="modal fade" id="modal-show">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">查看苗场信息</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>编号</label>
+                                <label class="form-control showinfo" id="sId"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>苗场名称</label>
+                                <label class="form-control showinfo" id="sName"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>地址</label>
+                                <label class="form-control showinfo" id="sAddress"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>联系人</label>
+                                <label class="form-control showinfo" id="sContacts"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>联系电话</label>
+                                <label class="form-control showinfo" id="sTel"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <label class="form-control showinfo" id="sInfo"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>状态</label>
+                                <label class="form-control showinfo" id="sFlag"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>添加时间</label>
+                                <label class="form-control showinfo" id="sTime"></label>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsAdd}}
+            <div class="modal fade" id="modal-default">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">新增苗场</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>苗场名称</label>
+                                <input type="text" class="form-control" id="iName" placeholder="苗场名称" />
+                            </div>
+                            <div class="form-group">
+                                <label>地址</label>
+                                <input type="text" class="form-control" id="iAddress" placeholder="地址" />
+                            </div>
+                            <div class="form-group">
+                                <label>联系人</label>
+                                <input type="text" class="form-control" id="iContacts" placeholder="联系人" />
+                            </div>
+                            <div class="form-group">
+                                <label>联系电话</label>
+                                <input type="text" class="form-control" id="iTel" placeholder="联系电话" />
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <input type="text" class="form-control" id="iInfo" placeholder="描述" />
+                            </div>
+                            <div class="form-group">
+                                <label>状态</label>
+                                <div class="form-group clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="irad_0" value="0" name="iFlag">
+                                        <label for="irad_0">
+                                            禁用
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="irad_1" value="1" name="iFlag">
+                                        <label for="irad_1">
+                                            维护
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="irad_2" value="2" name="iFlag">
+                                        <label for="irad_2">
+                                            正常
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btnAdd">新增</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsUpdate}}
+            <div class="modal fade" id="modal-edit">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">修改苗木类型</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="">编号</label>
+                                <label class="lbId"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>苗木类型名</label>
+                                <input type="text" class="form-control" id="eName" placeholder="苗场名称">
+                            </div>
+                            <div class="form-group">
+                                <label>地址</label>
+                                <input type="text" class="form-control" id="eAddress" placeholder="地址" />
+                            </div>
+                            <div class="form-group">
+                                <label>联系人</label>
+                                <input type="text" class="form-control" id="eContacts" placeholder="联系人" />
+                            </div>
+                            <div class="form-group">
+                                <label>联系电话</label>
+                                <input type="text" class="form-control" id="eTel" placeholder="联系电话" />
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <input type="text" class="form-control" id="eInfo" placeholder="描述" />
+                            </div>
+                            <div class="form-group">
+                                <label>状态</label>
+                                <div class="form-group clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="erad_0" value="0" name="eFlag">
+                                        <label for="erad_0">
+                                            禁用
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="erad_1" value="1" name="eFlag">
+                                        <label for="erad_1">
+                                            维护
+                                        </label>
+                                    </div>
+                                    <div class="icheck-primary d-inline">
+                                        <input type="radio" id="erad_2" value="2" name="eFlag">
+                                        <label for="erad_2">
+                                            启用
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btn-save">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsDel}}
+            <div class="modal fade" id="modal-dialog" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">确认</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="delshow"></p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-dark">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    {{template "foot" .}}
+    {{if .operat.IsQuery}}
+        <script type="text/javascript">
+            function showinfo(e) {
+                if (e.nodeName == "A") {
+                    document.querySelectorAll(".modal-body .showinfo").forEach(function (i) {
+                        i.textContent = "";
+                    });
+                    document.querySelector("#sId").textContent = $(e).attr("attr-id");
+                    document.querySelector("#sName").textContent = $(e).attr("attr-rn");
+                    document.querySelector("#sAddress").textContent = $(e).attr("attr-prn");
+                    document.querySelector("#sContacts").textContent = $(e).attr("attr-contact");
+                    document.querySelector("#sTel").textContent = $(e).attr("attr-ptel");
+                    document.querySelector("#sInfo").textContent = $(e).attr("attr-info");
+                    document.querySelector("#sFlag").textContent = $(e).attr("attr-flag");
+                    document.querySelector("#sTime").textContent = $(e).attr("attr-time");
+                    $("#modal-show").modal("show");
+                }
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsAdd}}
+        <script type="text/javascript">
+            loaded(function () {
+                document.querySelector("#modal-default").addEventListener("showadd", function () {
+                    $("[name=iFlag]").prop("checked", false);
+                });
+                document.querySelectorAll(".modal-body input[type=text]").values("");
+                document.querySelector(".btnAdd").addEventListener("click", function () {
+                    fetch("/tree/AddTreePlant",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Plant_Name: $("#iName").val(),
+                                Plant_Address: $("#iAddress").val(),
+                                Plant_Contacts: $("#iContacts").val(),
+                                Plant_Tel: $("#iTel").val(),
+                                Plant_Info: $("#iInfo").val(),
+                                Flag: parseInt($("[name=iFlag]:checked").val())
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-default").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+        </script>
+    {{end}}
+    {{if .operat.IsUpdate}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-edit").on("click", function () {
+                    updateInfo(this);
+                });
+            });
+            loaded(function () {
+                document.querySelector(".btn-save").addEventListener("click", function () {
+                    fetch("/tree/UpdateTreePlant",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Plant_Id: parseInt($(this).attr("attr-id")),
+                                Plant_Name: $("#eName").val(),
+                                Plant_Address: $("#eAddress").val(),
+                                Plant_Contacts: $("#eContacts").val(),
+                                Plant_Tel: $("#eTel").val(),
+                                Plant_Info: $("#eInfo").val(),
+                                Flag: parseInt($("[name=eFlag]:checked").val())
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-edit").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            function updateInfo(o) {
+                var id = $(o).attr("attr-id");
+                $(".lbId").text(id);
+                $(".btn-save").attr("attr-id", id);
+                $("#eName").val($(o).attr("attr-rn"));
+                $("#eAddress").val($(o).attr("attr-prn"));
+                $("#eContacts").val($(o).attr("attr-contact"));
+                $("#eTel").val($(o).attr("attr-ptel"));
+                $("#eInfo").val($(o).attr("attr-info"));
+                $("[name=eFlag][value=" + $(o).attr("attr-flag") + "]").prop("checked", true);
+                $("#modal-edit").modal("show");
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsDel}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-del").on("click", function () {
+                    delInfo(this);
+                });
+            });
+            loaded(function () {
+                var btn = document.querySelector(".btn-dark");
+                if (btn != undefined) {
+                    btn.addEventListener("click", function () {
+                        var uid = this.getAttribute("attr-id");
+                        fetch("/tree/DelTreePlant", {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                            },
+                            body: "id=" + uid + "&" + Date.now()
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-dialog").modal("hide");
+                                location.reload();
+                            });
+
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                    });
+                }
+            })
+
+            function delInfo(o) {
+                var id = o.getAttribute("attr-id");
+                document.querySelector("#delshow").textContent = "确认要删除编号【" + id + "】的苗场信息吗？";
+                document.querySelector(".btn-dark").setAttribute("attr-id", id);
+                $("#modal-dialog").modal("show");
+            }
+        </script>
+    {{end}}
+</body>
+</html>

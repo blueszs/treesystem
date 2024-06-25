@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {{template "header" .}}
+    <link rel="stylesheet" href="../style/select2.min.css">
+    <link rel="stylesheet" href="../style/select2-bootstrap4.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">账号管理</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>账号名称</th>
+                                            <th>昵称</th>
+                                            <th>联系电话</th>
+                                            <th>微信编号</th>
+                                            <th>用户图像</th>
+                                            <th>添加时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range $k,$v:=.models}}
+                                        {{if eq $k "infos"}}
+                                        {{range $i:=$v}}
+                                                <tr>
+                                                    <td>{{$i.Member_Id}}</td>
+                                                    <td>{{$i.Member_Name}}</td>
+                                                    <td>{{$i.Member_Nick}}</td>
+                                                    <td>{{$i.Member_Tel}}</td>
+                                                    <td>{{$i.Member_WeChat_Id}}</td>
+                                                    <td><img src="{{$i.Member_Photo}}" style="width:40px; height: 40px;"></td>
+                                                    <td>{{$i.Create_Time}}</td>
+                                                    <td>
+                                                        {{if $.operat.IsUpdate}}
+                                                            <a href="#" class="link-primary link-edit" attr-id="{{$i.Member_Id}}" attr-rn="{{$i.Role_Name}}" attr-prid="{{$i.Parent_Id}}" attr-prn="{{$i.Parent_Role_Name}}" onclick="onupdate(this)">
+                                                                <i class="fa fa-edit"></i>
+                                                                <span>修改</span>
+                                                            </a>
+                                                        {{end}}
+                                                        {{if $.operat.IsDel}}
+                                                            <a href="#" class="link-primary link-del" attr-id="{{$i.Member_Id}}" onclick="ondel(this)">
+                                                                <i class="fa fa-trash"></i>
+                                                                <span>删除</span>
+                                                            </a>
+                                                        {{end}}
+                                                    </td>
+                                                </tr>
+                                        {{end}}
+                                        {{end}}
+                                        {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{if .operat.IsUpdate}}
+            <div class="modal fade" id="modal-edit">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">修改账号</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="">编号</label>
+                                <label class="lbId"></label>
+                            </div>
+                            <div class="form-group">
+                                <label>角色名</label>
+                                <input type="text" class="form-control" id="inputRId" placeholder="角色名">
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary btn-save">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+            {{if .operat.IsDel}}
+            <div class="modal fade" id="modal-dialog" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">确认</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id="delshow"></p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-dark">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    {{template "foot" .}}
+    {{if .operat.IsUpdate}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-edit").on("click", function () {
+                    onupdate(this);
+                });
+                $(".select2").select2();
+            });
+            loaded(function () {
+                document.querySelector(".btn-save").addEventListener("click", function () {
+                    fetch("/member/UpdateMemberInfo",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                Role_Id: parseInt($(this).attr("attr-id")),
+                                Role_Name: $("#inputRId").val(),
+                                Parent_Id: $("#inputParentId").val(),
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-edit").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            function onupdate(o) {
+                var id = $(o).attr("attr-id");
+                $(".lbId").text(id);
+                $(".btn-save").attr("attr-id", id);
+                $("#inputRId").val($(o).attr("attr-rn"));
+                $("#inputParentId").val($(o).attr("attr-prid"));
+                $("#modal-edit").modal("show");
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsDel}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-del").on("click", function () {
+                    ondel(this);
+                });
+            });
+            loaded(function () {
+                var btn = document.querySelector(".btn-dark");
+                if (btn != undefined) {
+                    btn.addEventListener("click", function () {
+                        var uid = this.getAttribute("attr-id");
+                        fetch("/member/delmemberinfo", {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                            },
+                            body: "id=" + uid + "&" + Date.now()
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-dialog").modal("hide");
+                                location.reload();
+                            });
+
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                    });
+                }
+            })
+
+            function ondel(o) {
+                var id = o.getAttribute("attr-id");
+                document.querySelector("#delshow").textContent = "确认要删除编号【" + id + "】会员吗？";
+                document.querySelector(".btn-dark").setAttribute("attr-id", id);
+                $("#modal-dialog").modal("show");
+            }
+        </script>
+    {{end}}
+</body>
+</html>

@@ -1,0 +1,1066 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {{template "header" .}}
+    <link rel="stylesheet" href="../style/select2.min.css">
+    <link rel="stylesheet" href="../style/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="../style/jqshades.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">苗木详情</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>苗木名称</th>
+                                            <th>所属苗场</th>
+                                            <th>苗木单价</th>
+                                            <th>实际价</th>
+                                            <th>成本价</th>
+                                            <th>计量单位</th>
+                                            <th>库存数量</th>
+                                            <th>售出数量</th>
+                                            <th>添加时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{range $k,$v:=.models}}
+                                    {{if eq $k "infos"}}
+                                    {{range $i:=$v}}
+                                        <tr>
+                                            <td>{{$i.Detail_Id}}</td>
+                                            <td>{{$i.Tree_Name}}</td>
+                                            <td>{{$i.Plant_Name}}</td>
+                                            <td>{{$i.Active_Price}}</td>
+                                            <td>{{$i.Real_Price}}</td>
+                                            <td>{{$i.Prime_Price}}</td>
+                                            <td>{{$i.Tree_Unity}}</td>
+                                            <td>{{$i.Store_Quantity}}</td>
+                                            <td>{{$i.Sales_Quantity}}</td>
+                                            <td>{{$i.Insert_Time}}</td>
+                                            <td>{{$i.Flag_Info}}</td>
+                                            <td>
+                                                {{if $.operat.IsQuery}}
+                                                    <a href="#" class="link-primary link-show" attr-id="{{$i.Detail_Id}}" onclick="showinfo(this)">
+                                                        <i class="fa fa-eye"></i>
+                                                        <span>详情</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsUpdate}}
+                                                    <a href="#" class="link-primary link-edit" attr-id="{{$i.Detail_Id}}" onclick="updateInfo(this)">
+                                                        <i class="fa fa-edit"></i>
+                                                        <span>修改</span>
+                                                    </a>
+                                                {{end}}
+                                                {{if $.operat.IsDel}}
+                                                    <a href="#" class="link-primary link-del" attr-id="{{$i.Detail_Id}}" onclick="delInfo(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                        <span>删除</span>
+                                                    </a>
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                    {{end}}
+                                    {{end}}
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{if .operat.IsQuery}}
+                <div class="modal fade" id="modal-show">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">苗木详情</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>编号</label>
+                                            <label class="form-control showinfo" id="sId"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>苗木名称</label>
+                                            <label class="form-control showinfo" id="sName"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>所属苗场</label>
+                                            <label class="form-control showinfo" id="spName"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称1</label>
+                                            <label type="text" class="form-control showinfo" id="skey1"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值1</label>
+                                            <label type="text" class="form-control showinfo" id="svalue1"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称2</label>
+                                            <label type="text" class="form-control showinfo" id="skey2"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值2</label>
+                                            <label type="text" class="form-control showinfo" id="svalue2"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称3</label>
+                                            <label type="text" class="form-control showinfo" id="skey3"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值3</label>
+                                            <label type="text" class="form-control showinfo" id="svalue3"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称4</label>
+                                            <label type="text" class="form-control showinfo" id="skey4"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值4</label>
+                                            <label type="text" class="form-control showinfo" id="svalue4"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称5</label>
+                                            <label type="text" class="form-control showinfo" id="skey5"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值5</label>
+                                            <label type="text" class="form-control showinfo" id="svalue5"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>成本价</label>
+                                            <label type="text" class="form-control showinfo" id="sprimeprice"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>显示单价</label>
+                                            <label type="text" class="form-control showinfo" id="sactiveprice"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>实际价</label>
+                                            <label type="text" class="form-control showinfo" id="srealprice"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>计量单位</label>
+                                            <label type="text" class="form-control showinfo" id="sunity"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>库存数量</label>
+                                            <label type="text" class="form-control showinfo" id="sstorequantity"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>售出数量</label>
+                                            <label type="text" class="form-control showinfo" id="ssalesquantity"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>图片预览</label>
+                                            <div class="input-group">
+                                                <div id="simgshow" class="box_jqshades">
+                                                    <div class="list">
+                                                        <ul>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>状态</label>
+                                            <label class="form-control showinfo" id="sFlag"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>添加时间</label>
+                                            <label class="form-control showinfo" id="sTime"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+            {{if .operat.IsAdd}}
+                <div class="modal fade" id="modal-default">
+                    <div class="modal-dialog" style="min-width:880px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">新增苗木详情</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>苗木名称</label>
+                                            <select class="form-control select2" id="itreeid">
+                                                <option value="0">请选择苗木名称</option>
+                                                {{range $k,$v:=.models}}
+                                                {{if eq $k "classes"}}
+                                                {{range $i:=$v}}
+                                                <option value="{{$i.Tree_Id}}">{{$i.Tree_Name}}</option>
+                                                {{end}}
+                                                {{end}}
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>所属苗场</label>
+                                            <select class="form-control select2" id="iplantid">
+                                                <option value="0">请所属苗场</option>
+                                                {{range $k,$v:=.models}}
+                                                {{if eq $k "plants"}}
+                                                {{range $i:=$v}}
+                                                <option value="{{$i.Plant_Id}}">{{$i.Plant_Name}}</option>
+                                                {{end}}
+                                                {{end}}
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称1</label>
+                                            <input type="text" class="form-control" id="ikey1" placeholder="请输入维度名称1">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值1</label>
+                                            <input type="text" class="form-control" id="ivalue1" placeholder="请输入维度值1">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称2</label>
+                                            <input type="text" class="form-control" id="ikey2" placeholder="请输入维度名称2">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值2</label>
+                                            <input type="text" class="form-control" id="ivalue2" placeholder="请输入维度值2">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称3</label>
+                                            <input type="text" class="form-control" id="ikey3" placeholder="请输入维度名称3">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值3</label>
+                                            <input type="text" class="form-control" id="ivalue3" placeholder="请输入维度值3">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称4</label>
+                                            <input type="text" class="form-control" id="ikey4" placeholder="请输入维度名称4">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值4</label>
+                                            <input type="text" class="form-control" id="ivalue4" placeholder="请输入维度值4">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称5</label>
+                                            <input type="text" class="form-control" id="ikey5" placeholder="请输入维度名称5">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值5</label>
+                                            <input type="text" class="form-control" id="ivalue5" placeholder="请输入维度值5">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>成本价</label>
+                                            <input type="text" class="form-control" id="iprimeprice" placeholder="成本价">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>显示单价</label>
+                                            <input type="text" class="form-control" id="iactiveprice" placeholder="显示单价">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>实际价</label>
+                                            <input type="text" class="form-control" id="irealprice" placeholder="实际价">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>计量单位</label>
+                                            <input type="text" class="form-control" id="iunity" placeholder="计量单位">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>库存数量</label>
+                                            <input type="text" class="form-control" id="istorequantity" placeholder="库存数量">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>售出数量</label>
+                                            <input type="text" class="form-control" id="isalesquantity" placeholder="售出数量">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>详情图片</label>
+                                            <div class="input-group">
+                                                <div class="custom-file ifile">
+                                                    <input type="file" accept="image/*" class="custom-file-input" multiple id="iMainPhoto">
+                                                    <label class="custom-file-label" for="iMainPhoto">选择图片</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>图片预览</label>
+                                            <div class="input-group">
+                                                <div id="iimgshow" class="box_jqshades">
+                                                    <div class="list">
+                                                        <ul>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>状态</label>
+                                            <div class="form-group clearfix">
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" id="irad_0" value="0" name="iFlag">
+                                                    <label for="irad_0">
+                                                        禁用
+                                                    </label>
+                                                </div>
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" id="irad_1" value="1" name="iFlag">
+                                                    <label for="irad_1">
+                                                        维护
+                                                    </label>
+                                                </div>
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" id="irad_2" value="2" name="iFlag">
+                                                    <label for="irad_2">
+                                                        正常
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" class="btn btn-primary btnAdd">新增</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+            {{if .operat.IsUpdate}}
+                <div class="modal fade" id="modal-edit">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">修改苗木类型</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="">编号</label>
+                                            <label class="form-control" id="eid"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>苗木名称</label>
+                                            <select class="form-control select2" id="etreeid">
+                                                <option value="0">请选择苗木名称</option>
+                                                {{range $k,$v:=.models}}
+                                                {{if eq $k "classes"}}
+                                                {{range $i:=$v}}
+                                                <option value="{{$i.Tree_Id}}">{{$i.Tree_Name}}</option>
+                                                {{end}}
+                                                {{end}}
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>所属苗场</label>
+                                            <select class="form-control select2" id="eplantid">
+                                                <option value="0">请所属苗场</option>
+                                                {{range $k,$v:=.models}}
+                                                {{if eq $k "plants"}}
+                                                {{range $i:=$v}}
+                                                <option value="{{$i.Plant_Id}}">{{$i.Plant_Name}}</option>
+                                                {{end}}
+                                                {{end}}
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称1</label>
+                                            <input type="text" class="form-control" id="ekey1" placeholder="请输入维度名称1">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值1</label>
+                                            <input type="text" class="form-control" id="evalue1" placeholder="请输入维度值1">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称2</label>
+                                            <input type="text" class="form-control" id="ekey2" placeholder="请输入维度名称2">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值2</label>
+                                            <input type="text" class="form-control" id="evalue2" placeholder="请输入维度值2">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称3</label>
+                                            <input type="text" class="form-control" id="ekey3" placeholder="请输入维度名称3">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值3</label>
+                                            <input type="text" class="form-control" id="evalue3" placeholder="请输入维度值3">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称4</label>
+                                            <input type="text" class="form-control" id="ekey4" placeholder="请输入维度名称4">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值4</label>
+                                            <input type="text" class="form-control" id="evalue4" placeholder="请输入维度值4">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度名称5</label>
+                                            <input type="text" class="form-control" id="ekey5" placeholder="请输入维度名称5">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>维度值5</label>
+                                            <input type="text" class="form-control" id="evalue5" placeholder="请输入维度值5">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>成本价</label>
+                                            <input type="text" class="form-control" id="eprimeprice" placeholder="成本价">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>显示单价</label>
+                                            <input type="text" class="form-control" id="eactiveprice" placeholder="显示单价">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>实际价</label>
+                                            <input type="text" class="form-control" id="erealprice" placeholder="实际价">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>计量单位</label>
+                                            <input type="text" class="form-control" id="eunity" placeholder="计量单位">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>库存数量</label>
+                                            <input type="text" class="form-control" id="estorequantity" placeholder="库存数量">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>售出数量</label>
+                                            <input type="text" class="form-control" id="esalesquantity" placeholder="售出数量">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>详情图片</label>
+                                            <div class="input-group">
+                                                <div class="custom-file efile">
+                                                    <input type="file" accept="image/*" class="custom-file-input" multiple id="eMainPhoto">
+                                                    <label class="custom-file-label" for="eMainPhoto">选择图片</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>图片预览</label>
+                                            <div class="input-group">
+                                                <div id="eimgshow" class="box_jqshades">
+                                                    <div class="list">
+                                                        <ul>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label>状态</label>
+                                            <div class="form-group clearfix">
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" id="erad_0" value="0" name="eFlag">
+                                                    <label for="erad_0">
+                                                        禁用
+                                                    </label>
+                                                </div>
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" id="erad_1" value="1" name="eFlag">
+                                                    <label for="erad_1">
+                                                        维护
+                                                    </label>
+                                                </div>
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" id="erad_2" value="2" name="eFlag">
+                                                    <label for="erad_2">
+                                                        启用
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                <button type="button" class="btn btn-primary btn-save">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+            {{if .operat.IsDel}}
+                <div class="modal fade" id="modal-dialog" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">确认</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="delshow"></p>
+                            </div>
+                            <div class="modal-footer justify-content-between">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-dark">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+        </section>
+        <aside class="control-sidebar control-sidebar-dark">
+        </aside>
+    </div>
+    {{template "foot" .}}
+    <script src="../lib/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    <script src="../lib/select2/select2.full.min.js"></script>
+    <script src="../script/jqshades.min.js"></script>
+    {{if or .operat.IsQuery .operat.IsUpdate}}
+        <script type="text/javascript">
+            function getdetail(e,fn) {
+                fetch("/tree/GetTreeDetail",{
+                    method: "post",
+                    headers: {
+                        "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    body: "id=" + e + "&" + Date.now()
+                }).then((response) => {
+                    return response.json();
+                }).then((json)=>{
+                    fn(json);
+                }).catch((err)=>{
+                    console.log('Request failed', err);
+                    errorMsg(err);
+                });
+            }
+        </script>
+    {{end}}
+    {{if or .operat.IsAdd .operat.IsUpdate}}
+        <script type="text/javascript">
+            function uploads(fd, fn) {
+                fetch("/v1/api/Uploads", {
+                    method: "post",
+                    body: fd
+                }).then((response) => {
+                    return response.json();
+                }).then((json) => {
+                    fn(json);
+                }).catch((err) => {
+                    console.log('Request failed', err);
+                    errorMsg(err);
+                });
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsQuery}}
+        <script type="text/javascript">
+            function showinfo(e) {
+                if (e.nodeName == "A") {
+                    document.querySelectorAll(".modal-body .showinfo").forEach(function (i) {
+                        i.textContent = "";
+                    });
+                    var id =$(e).attr("attr-id");
+                    getdetail(id,(json)=>{
+                        if (json != undefined && json.code!=="0") {
+                            var obj = json.data;
+                            $("#sId").text(obj.detail_id);
+                            $("#sName").text(obj.tree_name);
+                            $("#spName").text(obj.plant_name);
+                            $("#skey1").text(obj.detail_dim_key1);
+                            $("#svalue1").text(obj.detail_dim_value1);
+                            $("#skey2").text(obj.detail_dim_key2);
+                            $("#svalue2").text(obj.detail_dim_value2);
+                            $("#skey3").text(obj.detail_dim_key3);
+                            $("#svalue3").text(obj.detail_dim_value3);
+                            $("#skey4").text(obj.detail_dim_key4);
+                            $("#svalue4").text(obj.detail_dim_value4);
+                            $("#skey5").text(obj.detail_dim_key5);
+                            $("#svalue5").text(obj.detail_dim_value5);
+                            $("#sprimeprice").text(obj.prime_price);
+                            $("#sactiveprice").text(obj.active_price);
+                            $("#srealprice").text(obj.real_price);
+                            $("#sunity").text(obj.tree_unity);
+                            $("#sstorequantity").text(obj.store_quantity);
+                            $("#ssalesquantity").text(obj.sales_quantity);
+                            $("#sFlag").text(obj.flag_info);
+                            $("#sTime").text(obj.insert_time);
+                            $("#simgshow ul").remove();
+                            let html = "<ul>";
+                            for (var i = 0; i < obj.TreeDetailPhotos.length; i++) {
+                                html += "<li>";
+                                html += "<img src='" + obj.TreeDetailPhotos[i].img_source + "'>"
+                                html += "</li>";
+                            }
+                            html += "</ul>"
+                            $("#simgshow .list").append(html);
+                            new AutoPlay("simgshow");
+                            $("#modal-show").modal("show");
+                        }else{
+                            errorMsg(json.message);
+                        }
+                    });
+                }
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsAdd}}
+        <script type="text/javascript">
+            loaded(function () {
+                document.querySelector("#modal-default").addEventListener("showadd", function () {
+                    $("[name=iFlag]").prop("checked", false);
+                    $("#modal-default input:text").val("");
+                    $("#iClassId").val(0);
+                    $("#iInfo").val("");
+                    $(".ifile").attr("attr-mphoto", "");
+                    $(".ifile").attr("attr-mth", "");
+                    $("#iMainPhotoThumbnail").attr("src", "");
+                });
+                document.querySelectorAll(".modal-body input[type=text]").values("");
+                document.querySelector(".btnAdd").addEventListener("click", function () {
+                    fetch("/tree/AddTreeDetail", {
+                        method: "post",
+                        headers: {
+                            "Content-type": "application/json;charset=UTF-8"
+                        },
+                        body: JSON.stringify({
+                            tree_id: parseInt($("#itreeid").val()),
+                            plant_id: parseInt($("#iplantid").val()),
+                            detail_dim_key1: $("#ikey1").val(),
+                            detail_dim_value1: $("#ivalue1").val(),
+                            detail_dim_key2: $("#ikey2").val(),
+                            detail_dim_value2: $("#ivalue2").val(),
+                            detail_dim_key3: $("#ikey3").val(),
+                            detail_dim_value3: $("#ivalue3").val(),
+                            detail_dim_key4: $("#ikey4").val(),
+                            detail_dim_value4: $("#ivalue4").val(),
+                            detail_dim_key5: $("#ikey5").val(),
+                            detail_dim_value5: $("#ivalue5").val(),
+                            tree_unity: $("#iunity").val(),
+                            store_quantity: parseInt(("#istorequantity").val()),
+                            sales_quantity: parseInt($("#isalesquantity").val()),
+                            active_price: parseFloat($("#iactiveprice").val()),
+                            prime_price: parseFloat($("#iprimeprice").val()),
+                            real_price: parseFloat($("#irealprice").val()),
+                            TreeDetailPhotos: JSON.parse($(".ifile").attr("attr-mphoto")),
+                            flag: $("[name=iFlag]:checked").val()
+                        })
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (json) {
+                        message(json, function () {
+                            $("#modal-default").modal("hide");
+                            $(".ifile").attr("attr-mphoto", "");
+                            location.reload();
+                        });
+                    }).catch(function (error) {
+                        console.log('Request failed', error);
+                        errorMsg(error);
+                    });
+                });
+            });
+            $(function () {
+                bsCustomFileInput.init();
+                $("#iMainPhoto").on("change", function () {
+                    let formData = new FormData();
+                    let ar = document.querySelector("#iMainPhoto").files;
+                    for (let i = 0; i < ar.length; i++) {
+                        formData.append("files", ar[i]);
+                    }
+                    $.ajax({
+                        url: "/v1/api/Uploads",
+                        type: "POST",
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            if (data.code == "1") {
+                                $("#iimgshow ul").remove();
+                                let html = "<ul>";
+                                var imgs = new Array();
+                                for (var i = 0; i < data.data.length; i++) {
+                                    html += "<li>";
+                                    html += "<img src='" + data.data[i] + "'>"
+                                    html += "</li>";
+                                    imgs.push({ img_source: data.data[i] });
+                                }
+                                html += "</ul>"
+                                $("#iimgshow .list").append(html);
+                                new AutoPlay("iimgshow");
+                                $(".ifile").attr("attr-mphoto", JSON.stringify(imgs));
+                                $("#iMainPhoto").val("");
+                            }
+                        },
+                        error: function (err) {
+                            errorMsg(err);
+                            $("#iMainPhoto").val("");
+                        }
+                    });
+                });
+            });
+        </script>
+    {{end}}
+    {{if .operat.IsUpdate}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-edit").on("click", function () {
+                    updateInfo(this);
+                });
+                $('.select2').select2({
+                    theme: "bootstrap4",
+                    language: "zh-CN"
+                });
+                bsCustomFileInput.init();
+                $("#eMainPhoto").on("change", function () {
+                    let formData = new FormData();
+                    let ar = document.querySelector("#eMainPhoto").files;
+                    for (let i = 0; i < ar.length; i++) {
+                        formData.append("files", ar[i]);
+                    }
+                    uploads(formData,(json)=>{
+                        if (json.code = "1") {
+                            $("#eimgshow ul").remove();
+                            let html = "<ul>";
+                            var imgs = new Array();
+                            for (var i = 0; i < json.data.length; i++) {
+                                html += "<li>";
+                                html += "<img src='" + json.data[i] + "'>"
+                                html += "</li>";
+                                imgs.push({ img_source: json.data[i] });
+                            }
+                            html += "</ul>"
+                            $("#eimgshow .list").append(html);
+                            new AutoPlay("eimgshow");
+                            $(".efile").attr("attr-mphoto", JSON.stringify(imgs));
+                            $("#eMainPhoto").val("");
+                        }else{
+                            errorMsg(err);
+                            $("#eMainPhoto").val("");
+                        }
+                    });
+                });
+
+            });
+            loaded(function () {
+                document.querySelector(".btn-save").addEventListener("click", function () {
+                    fetch("/tree/UpdateTreeDetail",
+                        {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/json;charset=UTF-8"
+                            },
+                            body: JSON.stringify({
+                                detail_id: parseInt($(this).attr("attr-id")),
+                                tree_id: parseInt($("#etreeid").val()),
+                                plant_id: parseInt($("#eplantid").val()),
+                                detail_dim_key1: $("#ekey1").val(),
+                                detail_dim_value1: $("#evalue1").val(),
+                                detail_dim_key2: $("#ekey2").val(),
+                                detail_dim_value2: $("#evalue2").val(),
+                                detail_dim_key3: $("#ekey3").val(),
+                                detail_dim_value3: $("#evalue3").val(),
+                                detail_dim_key4: $("#ekey4").val(),
+                                detail_dim_value4: $("#evalue4").val(),
+                                detail_dim_key5: $("#ekey5").val(),
+                                detail_dim_value5: $("#evalue5").val(),
+                                tree_unity: $("#eunity").val(),
+                                store_quantity: parseInt($("#estorequantity").val()),
+                                sales_quantity: parseInt($("#esalesquantity").val()),
+                                active_price: parseFloat($("#eactiveprice").val()),
+                                prime_price: parseFloat($("#eprimeprice").val()),
+                                real_price: parseFloat($("#erealprice").val()),
+                                TreeDetailPhotos: JSON.parse($(".efile").attr("attr-mphoto")),
+                                flag: $("[name=eFlag]:checked").val()
+                            })
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-edit").modal("hide");
+                                location.reload();
+                            });
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                });
+            });
+            function updateInfo(o) {
+                var id = $(o).attr("attr-id");
+                getdetail(id, (json) => {
+                    if (json != undefined && json.code !== "0") {
+                        var obj= json.data;
+                        $("#eid").text(obj.detail_id);
+                        $(".btn-save").attr("attr-id", obj.detail_id);
+                        $("#etreeid").val(obj.tree_id);
+                        $("#eplantid").val(obj.plant_id);
+                        $("#ekey1").val(obj.detail_dim_key1);
+                        $("#evalue1").val(obj.detail_dim_value1);
+                        $("#ekey2").val(obj.detail_dim_key2);
+                        $("#evalue2").val(obj.detail_dim_value2);
+                        $("#ekey3").val(obj.detail_dim_key3);
+                        $("#evalue3").val(obj.detail_dim_value3);
+                        $("#ekey4").val(obj.detail_dim_key4);
+                        $("#evalue4").val(obj.detail_dim_value4);
+                        $("#ekey5").val(obj.detail_dim_key5);
+                        $("#evalue5").val(obj.detail_dim_value5);
+                        $("#eprimeprice").val(obj.prime_price);
+                        $("#eactiveprice").val(obj.active_price);
+                        $("#erealprice").val(obj.real_price);
+                        $("#eunity").val(obj.tree_unity);
+                        $("#estorequantity").val(obj.store_quantity);
+                        $("#esalesquantity").val(obj.sales_quantity);
+                        $("[name=eFlag][value=" + obj.flag + "]").prop("checked", true);
+                        $("#eimgshow ul").remove();
+                        let html = "<ul>";
+                        for (var i = 0; i < obj.TreeDetailPhotos.length; i++) {
+                            html += "<li>";
+                            html += "<img src='" + obj.TreeDetailPhotos[i].img_source + "'>"
+                            html += "</li>";
+                        }
+                        html += "</ul>"
+                        $(".efile").attr("attr-mphoto", JSON.stringify(obj.TreeDetailPhotos));
+                        $("#eimgshow .list").append(html);
+                        new AutoPlay("eimgshow");
+                        $("#modal-edit").modal("show");
+                    } else {
+                        errorMsg(json.message);
+                    }
+                });
+            }
+        </script>
+    {{end}}
+    {{if .operat.IsDel}}
+        <script type="text/javascript">
+            $(function () {
+                $(".link-del").on("click", function () {
+                    delInfo(this);
+                });
+            });
+            loaded(function () {
+                var btn = document.querySelector(".btn-dark");
+                if (btn != undefined) {
+                    btn.addEventListener("click", function () {
+                        var uid = this.getAttribute("attr-id");
+                        fetch("/tree/DelTreePlant", {
+                            method: "post",
+                            headers: {
+                                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+                            },
+                            body: "id=" + uid + "&" + Date.now()
+                        }).then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            message(json, function () {
+                                $("#modal-dialog").modal("hide");
+                                location.reload();
+                            });
+
+                        }).catch(function (error) {
+                            console.log('Request failed', error);
+                            errorMsg(error);
+                        });
+                    });
+                }
+            })
+
+            function delInfo(o) {
+                var id = o.getAttribute("attr-id");
+                document.querySelector("#delshow").textContent = "确认要删除编号【" + id + "】的苗场信息吗？";
+                document.querySelector(".btn-dark").setAttribute("attr-id", id);
+                $("#modal-dialog").modal("show");
+            }
+        </script>
+    {{end}}
+</body>
+</html>
